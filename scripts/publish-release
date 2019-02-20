@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+const publishRelease = require('publish-release')
+
+const getAssets = require('./_get-assets')
+const vars = require('./_vars')
+
+
+const assets = getAssets()
+
+if (assets.length === 0) {
+  throw new Error('Build assets is not found.')
+}
+
+if (!vars.appVersion) {
+  console.log('Release version is not found.')
+  process.exit(0)
+}
+
+console.log(`Creating GitHub release v${vars.appVersion}`)
+console.log(`OS ${process.env.TRAVIS_OS_NAME}`)
+
+publishRelease({
+  token: process.env.GITHUB_TOKEN,
+  owner: 'mavajee', 
+  repo: 'test__electron_build', //CONFIG.channel !== 'nightly' ? 'atom' : 'atom-nightly-releases'
+  name: vars.appVersion, //CONFIG.computedAppVersion
+  notes: vars.notes,
+  tag: `${vars.appVersion}`, //`v${CONFIG.computedAppVersion}`
+  draft: false,
+  reuseRelease: true,
+  skipIfPublished: true,
+  editRelease: true,
+  assets: assets
+}, function (err, release) {
+  if (err) {
+    console.error("An error occurred while publishing the release:\n\n", err)
+    process.exit(1)
+  } else {
+    console.log("Release published successfully: ", release.html_url)
+    process.exit(0)
+  }
+})

@@ -1,0 +1,44 @@
+env:
+  global:
+  - secure: U+nUZcbIO+1idMmPlZP9c+elDWzeXOe2ucAlYdDEqhOndFN2RaFSnkX5HxKB70i59cpYMhiQnP8CTgT0eX5UVCns/xMtcrPo1VF3ZzhSdaueVWTW/270dJejmAb+7/Mw4jmPpPrMxM0CWLEJFOp44IgZoUffAAcDggKZjzUehZUh+gQkOmL+OGz6hk62ljke3qKh3L4BKHoMWfnqGnTm/T5/89i+cIENRZ/Xxc2VrD3YQPA2d3zpaU21+9b6QZAwlR9xaVM69Gh+5Momugzd7RZQx7SoPbJ7S0luw+gawyVAG4KjK60+Pyk4vhhhsOKipvSa6L8VhYze/3LXYIY7R9SXYGOGWub61m+5tYVMiSfZBq0WcjUk0ynVptx6z+wwf0OEKM8AuKvfmYbKE8qWIUiZia4ck9VEQbBDSZHd9yNTUmdBLRG6iBn2q+jzvgTYlywoacB+InzqvJuOqtVVG+sTpdoSW+vN5xpjUxz4O5wF1Lay2a2gMIg4Auq+8Gb/dymgHP1zrE9/Uyve2lFqpdhbHre98JTAXOekshsRH8amVG14+wNFLsuzRS6PaVgWvnspFf5z4P4/1UYNqgy77XJVtvU8eBZ3rcRpxUX/tv2u6g6BOaW9xkfUrasDAlOWmc1vgwSpUL9jnX+J5b7ckPoRSmjdqd48boASJisc5ss=
+
+branches:
+  only:
+  - master
+
+matrix:
+  include:
+  - os: osx
+    osx_image: xcode9.3
+    language: node_js
+    node_js: '10'
+
+  - os: linux
+    language: node_js
+    node_js: '10'
+
+cache:
+  directories:
+  - node_modules
+  - scripts/node_modules
+  - "$HOME/.cache/electron"
+  - "$HOME/.cache/electron-builder"
+
+before_cache:
+- rm -rf $HOME/.cache/electron-builder/wine
+
+before_install:
+- echo starting...
+
+script:
+- npm run test
+- |
+  if [ "$TRAVIS_TAG" ]; then
+    echo Start app building...
+    npm run build
+    echo Start release publishing...
+    cd ./scripts
+    yarn install
+    "./publish-release"
+  fi
+

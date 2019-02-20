@@ -1,0 +1,9 @@
+{
+  "name": "build-scripts",
+  "description": "build scripts",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^7.1.2",
+    "publish-release": "^1.6.0"
+  }
+}
